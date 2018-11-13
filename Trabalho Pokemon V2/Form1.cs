@@ -21,23 +21,41 @@ namespace Trabalho_Pokemon_V2
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string conn = ConfigurationManager.ConnectionStrings["MySQLConnectionString"].ToString();
+            // faz a ligaçao com o banco de dados a partir da string de conexao feita pelo app config
+            string conn = ConfigurationManager.ConnectionStrings["MySQLconnectionString"].ToString();
+            //criaçao da variavel de conexao
             MySqlConnection conexao = new MySqlConnection(conn);
-
+            // tenta abrir a conexao e exibe a mensagem 
             try
             {
                 conexao.Open();
-                MessageBox.Show("conexão criada com sucesso");
+                MySqlCommand comando = new MySqlCommand();
+                comando = conexao.CreateCommand();
+                
+                // faz a string de pesquisa 
+                comando.CommandText = "select treinador from pokemon_table;";
+                MySqlDataReader reader = comando.ExecuteReader();
+                // enquanto nao for nulo o campo "treinador" e ira mostrar por mensagebox
+                while (reader.Read())
+                {
+                    if(reader["Treinador"] != null)
+                    {
+                        MessageBox.Show(reader["Treinador"].ToString());
+                    }
+                }
             }
-            catch(MySqlException msqle)
+            // se nao conseguir realizar a conexao com o banco ira aparecer a mensagem de erro
+            catch (MySqlException msqle)
             {
-                MessageBox.Show("Erro de acesso a Conexão: " + msqle.Message, "Erro");
+                MessageBox.Show("Erro de acesso ao mysql: " + msqle.Message, "Erro");
             }
+            // finalmente ira fechar a conexao com o banco de dados
             finally
             {
                 conexao.Close();
             }
         }
 
+        
     }
 }
